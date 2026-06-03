@@ -1,0 +1,375 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>DompetKu 💰</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet" />
+  <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+  <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'Nunito', 'Segoe UI', sans-serif; background: #0f1117; color: #f0f0f0; }
+    ::-webkit-scrollbar { width: 4px; }
+    ::-webkit-scrollbar-track { background: #0f1117; }
+    ::-webkit-scrollbar-thumb { background: #333; border-radius: 99px; }
+    .btn-ghost { background: #ffffff08; border: 1px solid #ffffff10; color: #ccc; border-radius: 10px; padding: 7px 14px; font-size: 12px; cursor: pointer; font-family: inherit; transition: all 0.2s; font-weight: 700; }
+    .btn-ghost:hover { background: #ffffff14; color: #fff; }
+    .btn-sm { background: #ffffff08; border: 1px solid #ffffff10; color: #aaa; border-radius: 8px; padding: 4px 10px; font-size: 11px; cursor: pointer; font-family: inherit; font-weight: 700; margin-top: 4px; }
+    .btn-sm:hover { background: #ffffff14; color: #fff; }
+    .btn-primary { background: linear-gradient(135deg, #22c55e, #16a34a); border: none; color: #fff; border-radius: 14px; padding: 14px; font-size: 15px; font-weight: 800; cursor: pointer; font-family: inherit; transition: all 0.2s; letter-spacing: 0.3px; width: 100%; }
+    .btn-primary:hover { opacity: 0.9; transform: translateY(-1px); }
+    .btn-danger { background: #ef4444; border: none; color: #fff; border-radius: 12px; padding: 12px; font-size: 14px; font-weight: 700; cursor: pointer; font-family: inherit; flex: 1; }
+    .btn-close { background: #ffffff08; border: none; color: #888; border-radius: 8px; width: 32px; height: 32px; font-size: 20px; cursor: pointer; display: flex; align-items: center; justify-content: center; line-height: 1; }
+    .btn-close:hover { color: #fff; background: #ffffff14; }
+    .btn-circle { background: #1a1f2e; border: 1.5px solid #ffffff10; color: #fff; border-radius: 50%; width: 38px; height: 38px; font-size: 22px; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.2s; }
+    .btn-circle:hover { background: #ffffff14; }
+    .btn-del { background: none; border: none; color: #555; font-size: 16px; cursor: pointer; padding: 2px 6px; border-radius: 6px; display: block; margin-top: 3px; margin-left: auto; }
+    .btn-del:hover { color: #ef4444; background: #ef444415; }
+    .tab-btn { flex: 1; background: #ffffff06; border: 1.5px solid transparent; color: #888; border-radius: 12px; padding: 10px 6px; font-size: 12px; font-weight: 800; cursor: pointer; font-family: inherit; transition: all 0.2s; }
+    .tab-btn.active { background: #1a1f2e; border-color: #ffffff15; color: #f0f0f0; }
+    .tab-btn:hover:not(.active) { color: #ccc; background: #ffffff0a; }
+    .cat-btn { background: #0f1117; border: 2px solid #ffffff0a; color: #999; border-radius: 12px; padding: 8px 4px; font-size: 13px; cursor: pointer; display: flex; flex-direction: column; align-items: center; gap: 3px; transition: all 0.2s; font-family: inherit; }
+    .cat-btn.selected { border-color: var(--cat-color); color: var(--cat-color); background: color-mix(in srgb, var(--cat-color) 10%, transparent); }
+    .cat-btn:hover { border-color: var(--cat-color); }
+    .exp-row { display: flex; align-items: center; gap: 12; background: #1a1f2e; border: 1px solid #ffffff08; border-radius: 14px; padding: 12px 14px; margin-bottom: 8px; transition: all 0.2s; }
+    .exp-row:hover { border-color: #ffffff14; transform: translateY(-1px); }
+    .fab { position: fixed; bottom: 28px; right: 24px; width: 60px; height: 60px; border-radius: 50%; background: linear-gradient(135deg, #22c55e, #16a34a); border: none; color: #fff; font-size: 30px; font-weight: 300; cursor: pointer; box-shadow: 0 8px 24px #22c55e40; transition: all 0.2s; z-index: 500; display: flex; align-items: center; justify-content: center; }
+    .fab:hover { transform: scale(1.08); box-shadow: 0 12px 32px #22c55e55; }
+    .progress-anim { transition: width 0.8s cubic-bezier(0.34, 1.56, 0.64, 1); }
+    .modal-anim { animation: slideUp 0.3s cubic-bezier(0.34, 1.56, 0.64, 1); }
+    @keyframes slideUp { from { transform: translateY(60px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+    input[type=date]::-webkit-calendar-picker-indicator { filter: invert(0.7); }
+    input:focus { border-color: #22c55e !important; outline: none; }
+    .app-input { width: 100%; background: #0f1117; border: 1.5px solid #ffffff12; border-radius: 12px; padding: 11px 14px; color: #f0f0f0; font-size: 15px; outline: none; box-sizing: border-box; transition: border-color 0.2s; font-family: inherit; }
+  </style>
+</head>
+<body>
+  <div id="root"></div>
+  <script type="text/babel">
+    const { useState, useEffect } = React;
+    const STORAGE_KEY = "dompetku-data";
+    const MONTHS_ID = ["Januari","Februari","Maret","April","Mei","Juni","Juli","Agustus","September","Oktober","November","Desember"];
+    const CATEGORIES = [
+      { id: "makan", label: "🍜 Makan & Minum", color: "#f97316" },
+      { id: "transport", label: "🚗 Transportasi", color: "#3b82f6" },
+      { id: "belanja", label: "🛒 Belanja", color: "#a855f7" },
+      { id: "tagihan", label: "💡 Tagihan", color: "#ef4444" },
+      { id: "hiburan", label: "🎮 Hiburan", color: "#22c55e" },
+      { id: "kesehatan", label: "💊 Kesehatan", color: "#06b6d4" },
+      { id: "pendidikan", label: "📚 Pendidikan", color: "#f59e0b" },
+      { id: "lainnya", label: "📦 Lainnya", color: "#6b7280" },
+    ];
+    const getCatColor = (id) => CATEGORIES.find(c => c.id === id)?.color || "#6b7280";
+    const getCatLabel = (id) => CATEGORIES.find(c => c.id === id)?.label || id;
+    const monthKey = (y, m) => `${y}-${String(m).padStart(2,"0")}`;
+    const fmtRp = (n) => "Rp " + Number(n).toLocaleString("id-ID");
+
+    function ExpRow({ e, onDelete }) {
+      const color = getCatColor(e.category);
+      const label = getCatLabel(e.category);
+      const d = new Date(e.date + "T00:00:00");
+      return (
+        <div className="exp-row">
+          <div style={{ width:36, height:36, borderRadius:10, background:color, display:"flex", alignItems:"center", justifyContent:"center", fontSize:16, flexShrink:0 }}>
+            {label.split(" ")[0]}
+          </div>
+          <div style={{ flex:1, minWidth:0 }}>
+            <div style={{ fontWeight:600, fontSize:14, whiteSpace:"nowrap", overflow:"hidden", textOverflow:"ellipsis" }}>{e.desc}</div>
+            <div style={{ fontSize:12, color:"#666", marginTop:2 }}>{label.slice(3)} · {d.getDate()} {MONTHS_ID[d.getMonth()]}</div>
+          </div>
+          <div style={{ textAlign:"right" }}>
+            <div style={{ fontWeight:800, fontSize:14, color }}>{fmtRp(e.amount)}</div>
+            <button className="btn-del" onClick={() => onDelete(e.id)}>×</button>
+          </div>
+        </div>
+      );
+    }
+
+    function Modal({ title, onClose, children }) {
+      return (
+        <div style={{ position:"fixed", inset:0, background:"#000000cc", backdropFilter:"blur(8px)", display:"flex", alignItems:"flex-end", justifyContent:"center", zIndex:1000, padding:16 }}
+          onClick={e => e.target === e.currentTarget && onClose()}>
+          <div className="modal-anim" style={{ background:"#1a1f2e", border:"1.5px solid #ffffff12", borderRadius:"24px 24px 20px 20px", padding:24, width:"100%", maxWidth:500, maxHeight:"90vh", overflowY:"auto" }}>
+            <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center", marginBottom:20 }}>
+              <div style={{ fontWeight:800, fontSize:18 }}>{title}</div>
+              <button className="btn-close" onClick={onClose}>×</button>
+            </div>
+            {children}
+          </div>
+        </div>
+      );
+    }
+
+    function App() {
+      const now = new Date();
+      const [tab, setTab] = useState("dashboard");
+      const [yr, setYr] = useState(now.getFullYear());
+      const [mo, setMo] = useState(now.getMonth() + 1);
+      const [data, setData] = useState(() => {
+        try { const s = localStorage.getItem(STORAGE_KEY); return s ? JSON.parse(s) : { budgets:{}, expenses:[] }; }
+        catch { return { budgets:{}, expenses:[] }; }
+      });
+      const [budgetInput, setBudgetInput] = useState("");
+      const [showBudget, setShowBudget] = useState(false);
+      const [showExp, setShowExp] = useState(false);
+      const [deleteId, setDeleteId] = useState(null);
+      const [expForm, setExpForm] = useState({ desc:"", amount:"", category:"makan", date: now.toISOString().slice(0,10) });
+
+      useEffect(() => { try { localStorage.setItem(STORAGE_KEY, JSON.stringify(data)); } catch {} }, [data]);
+
+      const mk = monthKey(yr, mo);
+      const budget = data.budgets[mk] || 0;
+      const expenses = data.expenses.filter(e => e.monthKey === mk);
+      const totalSpent = expenses.reduce((s,e) => s + e.amount, 0);
+      const remaining = budget - totalSpent;
+      const pct = budget > 0 ? Math.min((totalSpent/budget)*100, 100) : 0;
+      const barColor = pct >= 90 ? "#ef4444" : pct >= 70 ? "#f97316" : "#22c55e";
+
+      const catBreakdown = CATEGORIES.map(cat => ({
+        ...cat,
+        total: expenses.filter(e => e.category === cat.id).reduce((s,e) => s+e.amount, 0)
+      })).filter(c => c.total > 0).sort((a,b) => b.total - a.total);
+      const topCat = catBreakdown[0] || null;
+
+      const sortedExp = [...expenses].sort((a,b) => new Date(b.date) - new Date(a.date));
+
+      const prevMonth = () => { if(mo===1){setYr(y=>y-1);setMo(12);}else setMo(m=>m-1); };
+      const nextMonth = () => { if(mo===12){setYr(y=>y+1);setMo(1);}else setMo(m=>m+1); };
+
+      const saveBudget = () => {
+        const val = parseInt(budgetInput.replace(/\D/g,""));
+        if(!val||val<=0) return;
+        setData(d => ({ ...d, budgets: { ...d.budgets, [mk]: val } }));
+        setBudgetInput(""); setShowBudget(false);
+      };
+
+      const addExpense = () => {
+        const amt = parseInt(expForm.amount.replace(/\D/g,""));
+        if(!expForm.desc.trim()||!amt||amt<=0) return;
+        setData(d => ({ ...d, expenses: [{ id:Date.now(), monthKey:mk, desc:expForm.desc.trim(), amount:amt, category:expForm.category, date:expForm.date }, ...d.expenses] }));
+        setExpForm({ desc:"", amount:"", category:"makan", date: new Date().toISOString().slice(0,10) });
+        setShowExp(false);
+      };
+
+      const deleteExpense = (id) => { setData(d => ({ ...d, expenses: d.expenses.filter(e => e.id !== id) })); setDeleteId(null); };
+
+      const exportData = () => {
+        const blob = new Blob([JSON.stringify(data,null,2)], { type:"application/json" });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a"); a.href=url; a.download=`pengeluaran-${mk}.json`; a.click(); URL.revokeObjectURL(url);
+      };
+
+      const importData = (e) => {
+        const file = e.target.files[0]; if(!file) return;
+        const reader = new FileReader();
+        reader.onload = ev => { try { const p = JSON.parse(ev.target.result); if(p.expenses&&p.budgets) setData(p); } catch {} };
+        reader.readAsText(file); e.target.value="";
+      };
+
+      return (
+        <div style={{ minHeight:"100vh", background:"#0f1117", color:"#f0f0f0", fontFamily:"'Nunito',sans-serif", paddingBottom:100 }}>
+
+          {/* Header */}
+          <header style={{ background:"linear-gradient(135deg,#1a1f2e,#0f1117)", borderBottom:"1px solid #ffffff0f", padding:"16px 20px", position:"sticky", top:0, zIndex:100 }}>
+            <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between", maxWidth:640, margin:"0 auto" }}>
+              <div style={{ display:"flex", alignItems:"center", gap:12 }}>
+                <span style={{ fontSize:32 }}>💰</span>
+                <div>
+                  <div style={{ fontWeight:800, fontSize:18, letterSpacing:-0.5 }}>DompetKu</div>
+                  <div style={{ fontSize:11, color:"#888" }}>Pencatat Keuangan Pribadi</div>
+                </div>
+              </div>
+              <div style={{ display:"flex", gap:8 }}>
+                <button className="btn-ghost" onClick={exportData}>⬇ Export</button>
+                <label className="btn-ghost" style={{ cursor:"pointer" }}>
+                  ⬆ Import
+                  <input type="file" accept=".json" style={{ display:"none" }} onChange={importData} />
+                </label>
+              </div>
+            </div>
+          </header>
+
+          {/* Month nav */}
+          <div style={{ display:"flex", alignItems:"center", justifyContent:"center", gap:20, padding:"20px 20px 10px", maxWidth:640, margin:"0 auto" }}>
+            <button className="btn-circle" onClick={prevMonth}>‹</button>
+            <div style={{ display:"flex", flexDirection:"column", alignItems:"center" }}>
+              <span style={{ fontWeight:800, fontSize:22, letterSpacing:-0.5 }}>{MONTHS_ID[mo-1]}</span>
+              <span style={{ fontSize:13, color:"#888" }}>{yr}</span>
+            </div>
+            <button className="btn-circle" onClick={nextMonth}>›</button>
+          </div>
+
+          {/* Summary cards */}
+          <div style={{ display:"grid", gridTemplateColumns:"repeat(3,1fr)", gap:10, padding:"0 16px", maxWidth:640, margin:"10px auto 0" }}>
+            {[
+              { label:"Anggaran", value: budget>0?fmtRp(budget):"—", color:"#22c55e", border:"#22c55e22", extra: <button className="btn-sm" onClick={()=>{setBudgetInput(budget?String(budget):"");setShowBudget(true);}}>{budget>0?"Ubah":"Set"}</button> },
+              { label:"Pengeluaran", value: fmtRp(totalSpent), color:"#ef4444", border:"#ef444422", extra: <div style={{fontSize:11,color:"#666"}}>{expenses.length} transaksi</div> },
+              { label:"Sisa", value: budget>0?fmtRp(remaining):"—", color: remaining<0?"#ef4444":"#3b82f6", border: remaining<0?"#ef444422":"#3b82f622", extra: remaining<0?<div style={{color:"#ef4444",fontSize:11}}>⚠ Over!</div>:null },
+            ].map((c,i) => (
+              <div key={i} style={{ background:"#1a1f2e", border:`1.5px solid ${c.border}`, borderRadius:16, padding:"14px 12px", display:"flex", flexDirection:"column", gap:4 }}>
+                <div style={{ fontSize:10, color:"#888", fontWeight:600, textTransform:"uppercase", letterSpacing:0.5 }}>{c.label}</div>
+                <div style={{ fontWeight:800, fontSize:13, color:c.color, lineHeight:1.2 }}>{c.value}</div>
+                {c.extra}
+              </div>
+            ))}
+          </div>
+
+          {/* Progress bar */}
+          {budget > 0 && (
+            <div style={{ maxWidth:640, margin:"16px auto 0", padding:"0 16px" }}>
+              <div style={{ height:8, background:"#ffffff10", borderRadius:99, overflow:"hidden" }}>
+                <div className="progress-anim" style={{ height:"100%", borderRadius:99, width:`${pct}%`, background:barColor }} />
+              </div>
+              <div style={{ fontSize:11, color:"#888", marginTop:5, textAlign:"right" }}>{pct.toFixed(1)}% terpakai</div>
+            </div>
+          )}
+
+          {/* Tabs */}
+          <div style={{ display:"flex", gap:4, padding:"16px 16px 0", maxWidth:640, margin:"0 auto" }}>
+            {[["dashboard","🏠 Ringkasan"],["pengeluaran","📋 Transaksi"],["statistik","📊 Statistik"]].map(([id,label]) => (
+              <button key={id} className={`tab-btn${tab===id?" active":""}`} onClick={() => setTab(id)}>{label}</button>
+            ))}
+          </div>
+
+          {/* Main */}
+          <main style={{ maxWidth:640, margin:"0 auto", padding:16 }}>
+
+            {tab === "dashboard" && (
+              <div>
+                {topCat && (
+                  <div style={{ background:"linear-gradient(135deg,#1a1f2e,#12161f)", border:"1.5px solid #ffffff10", borderRadius:20, padding:18, marginBottom:20 }}>
+                    <div style={{ fontSize:11, color:"#f59e0b", fontWeight:700, textTransform:"uppercase", letterSpacing:1 }}>🏆 Pengeluaran Terbesar</div>
+                    <div style={{ display:"flex", alignItems:"center", gap:12, marginTop:10 }}>
+                      <div style={{ width:42, height:42, borderRadius:12, background:topCat.color, display:"flex", alignItems:"center", justifyContent:"center", fontSize:20 }}>{topCat.label.split(" ")[0]}</div>
+                      <div>
+                        <div style={{ fontWeight:700, fontSize:15 }}>{topCat.label.slice(3)}</div>
+                        <div style={{ color:topCat.color, fontWeight:800, fontSize:18 }}>{fmtRp(topCat.total)}</div>
+                        {budget>0 && <div style={{ fontSize:12, color:"#888" }}>{((topCat.total/budget)*100).toFixed(1)}% dari anggaran</div>}
+                      </div>
+                    </div>
+                  </div>
+                )}
+                <div style={{ fontWeight:800, fontSize:14, color:"#888", textTransform:"uppercase", letterSpacing:1, marginBottom:12 }}>Transaksi Terbaru</div>
+                {sortedExp.slice(0,5).length===0
+                  ? <div style={{ textAlign:"center", color:"#555", padding:"40px 0", lineHeight:1.8 }}>Belum ada pengeluaran bulan ini.<br/>Tambahkan transaksi pertamamu! ✨</div>
+                  : sortedExp.slice(0,5).map(e => <ExpRow key={e.id} e={e} onDelete={setDeleteId} />)
+                }
+                {sortedExp.length>5 && <button className="btn-ghost" style={{ width:"100%", marginTop:8 }} onClick={()=>setTab("pengeluaran")}>Lihat semua {sortedExp.length} transaksi →</button>}
+              </div>
+            )}
+
+            {tab === "pengeluaran" && (
+              <div>
+                <div style={{ fontWeight:800, fontSize:14, color:"#888", textTransform:"uppercase", letterSpacing:1, marginBottom:12 }}>Semua Transaksi</div>
+                {sortedExp.length===0
+                  ? <div style={{ textAlign:"center", color:"#555", padding:"40px 0" }}>Belum ada pengeluaran bulan ini.</div>
+                  : sortedExp.map(e => <ExpRow key={e.id} e={e} onDelete={setDeleteId} />)
+                }
+              </div>
+            )}
+
+            {tab === "statistik" && (
+              <div>
+                <div style={{ fontWeight:800, fontSize:14, color:"#888", textTransform:"uppercase", letterSpacing:1, marginBottom:12 }}>Breakdown Kategori</div>
+                {catBreakdown.length===0
+                  ? <div style={{ textAlign:"center", color:"#555", padding:"40px 0" }}>Belum ada data statistik.</div>
+                  : catBreakdown.map(cat => (
+                    <div key={cat.id} style={{ background:"#1a1f2e", border:"1px solid #ffffff08", borderRadius:14, padding:"12px 14px", marginBottom:8 }}>
+                      <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center", marginBottom:8 }}>
+                        <div style={{ display:"flex", alignItems:"center", gap:10 }}>
+                          <span style={{ fontSize:20 }}>{cat.label.split(" ")[0]}</span>
+                          <div>
+                            <div style={{ fontWeight:600, fontSize:14 }}>{cat.label.slice(3)}</div>
+                            <div style={{ fontSize:12, color:"#888" }}>{expenses.filter(e=>e.category===cat.id).length} transaksi</div>
+                          </div>
+                        </div>
+                        <div style={{ textAlign:"right" }}>
+                          <div style={{ fontWeight:700, color:cat.color }}>{fmtRp(cat.total)}</div>
+                          {budget>0 && <div style={{ fontSize:12, color:"#888" }}>{((cat.total/budget)*100).toFixed(1)}%</div>}
+                        </div>
+                      </div>
+                      <div style={{ height:4, background:"#ffffff0a", borderRadius:99, overflow:"hidden" }}>
+                        <div className="progress-anim" style={{ height:"100%", borderRadius:99, width:`${totalSpent>0?(cat.total/totalSpent)*100:0}%`, background:cat.color }} />
+                      </div>
+                    </div>
+                  ))
+                }
+              </div>
+            )}
+          </main>
+
+          {/* FAB */}
+          <button className="fab" onClick={() => setShowExp(true)}>+</button>
+
+          {/* Budget Modal */}
+          {showBudget && (
+            <Modal title="Set Anggaran Bulan Ini" onClose={() => setShowBudget(false)}>
+              <div style={{ marginBottom:16 }}>
+                <label style={{ display:"block", fontSize:12, color:"#888", fontWeight:700, textTransform:"uppercase", letterSpacing:0.5, marginBottom:6 }}>
+                  Anggaran ({MONTHS_ID[mo-1]} {yr})
+                </label>
+                <input className="app-input" type="text" placeholder="Contoh: 3000000" value={budgetInput}
+                  onChange={e => setBudgetInput(e.target.value.replace(/\D/g,""))}
+                  onKeyDown={e => e.key==="Enter" && saveBudget()} autoFocus />
+                {budgetInput && <div style={{ fontSize:13, color:"#22c55e", marginTop:5, fontWeight:700 }}>{fmtRp(budgetInput)}</div>}
+              </div>
+              <button className="btn-primary" onClick={saveBudget}>Simpan Anggaran</button>
+            </Modal>
+          )}
+
+          {/* Expense Modal */}
+          {showExp && (
+            <Modal title="Tambah Pengeluaran" onClose={() => setShowExp(false)}>
+              <div style={{ marginBottom:16 }}>
+                <label style={{ display:"block", fontSize:12, color:"#888", fontWeight:700, textTransform:"uppercase", letterSpacing:0.5, marginBottom:6 }}>Keterangan</label>
+                <input className="app-input" placeholder="Makan siang, bensin, dll..." value={expForm.desc}
+                  onChange={e => setExpForm(f=>({...f,desc:e.target.value}))} autoFocus />
+              </div>
+              <div style={{ marginBottom:16 }}>
+                <label style={{ display:"block", fontSize:12, color:"#888", fontWeight:700, textTransform:"uppercase", letterSpacing:0.5, marginBottom:6 }}>Jumlah (Rp)</label>
+                <input className="app-input" type="text" placeholder="Contoh: 25000" value={expForm.amount}
+                  onChange={e => setExpForm(f=>({...f,amount:e.target.value.replace(/\D/g,"")}))} />
+                {expForm.amount && <div style={{ fontSize:13, color:"#22c55e", marginTop:5, fontWeight:700 }}>{fmtRp(expForm.amount)}</div>}
+              </div>
+              <div style={{ marginBottom:16 }}>
+                <label style={{ display:"block", fontSize:12, color:"#888", fontWeight:700, textTransform:"uppercase", letterSpacing:0.5, marginBottom:6 }}>Kategori</label>
+                <div style={{ display:"grid", gridTemplateColumns:"repeat(4,1fr)", gap:8 }}>
+                  {CATEGORIES.map(cat => (
+                    <button key={cat.id} className={`cat-btn${expForm.category===cat.id?" selected":""}`}
+                      style={{"--cat-color":cat.color}} onClick={() => setExpForm(f=>({...f,category:cat.id}))}>
+                      <span>{cat.label.split(" ")[0]}</span>
+                      <span style={{ fontSize:10 }}>{cat.label.slice(3)}</span>
+                    </button>
+                  ))}
+                </div>
+              </div>
+              <div style={{ marginBottom:16 }}>
+                <label style={{ display:"block", fontSize:12, color:"#888", fontWeight:700, textTransform:"uppercase", letterSpacing:0.5, marginBottom:6 }}>Tanggal</label>
+                <input className="app-input" type="date" value={expForm.date}
+                  onChange={e => setExpForm(f=>({...f,date:e.target.value}))} />
+              </div>
+              <button className="btn-primary" onClick={addExpense}>Tambah Pengeluaran</button>
+            </Modal>
+          )}
+
+          {/* Delete confirm */}
+          {deleteId && (
+            <Modal title="Hapus Transaksi?" onClose={() => setDeleteId(null)}>
+              <p style={{ color:"#888", marginBottom:20 }}>Transaksi ini akan dihapus permanen.</p>
+              <div style={{ display:"flex", gap:10 }}>
+                <button className="btn-ghost" style={{ flex:1 }} onClick={() => setDeleteId(null)}>Batal</button>
+                <button className="btn-danger" onClick={() => deleteExpense(deleteId)}>Hapus</button>
+              </div>
+            </Modal>
+          )}
+        </div>
+      );
+    }
+
+    ReactDOM.createRoot(document.getElementById("root")).render(<App />);
+  </script>
+</body>
+</html>
